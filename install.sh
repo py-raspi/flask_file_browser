@@ -30,7 +30,7 @@ pip install --upgrade pip setuptools wheel
 if [ -f "requirements.txt" ]; then
     pip install --no-cache-dir -r requirements.txt
 else
-    echo "⚠️ requirements.txt が見つかりません。"
+    echo "requirements.txt が見つかりません。"
 fi
 
 # アプリケーションの権限を適切に設定
