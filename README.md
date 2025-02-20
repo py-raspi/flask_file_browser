@@ -113,7 +113,7 @@ sudo smbpasswd -a pi
 ```
 
 ### Tailscale
-事前にTailscaleアカウントを作成
+事前にTailscaleアカウント(無料プラン)を作成
 ```
 curl -fsSL https://tailscale.com/install.sh | sh
 ```
