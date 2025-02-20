@@ -4,7 +4,8 @@ RaspberryPiに接続したストレージ内の画像・動画を閲覧できる
 TailscaleでVPNに接続し、Samba共有も行うため、外出先からでもアクセス・ファイル操作が可能です。
 
 ## introduction
-<code>sudo</code>を使用します。
+* <code>sudo</code>を使用します。
+* ユーザーが環境変数を設定する必要があります
 
 ## clone
 ```
