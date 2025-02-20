@@ -1,0 +1,15 @@
+{
+  "name": "My Flask App",
+  "short_name": "FlaskApp",
+  "icons": [
+    {
+      "src": "/static/icons/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000"
+}

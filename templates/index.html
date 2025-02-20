@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" sizes="512x512" href="{{ url_for('static', filename='icons/icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="" crossorigin="anonymous"></script>
+    <title>NAS</title>
+    <style>
+        body {
+            touch-action: manipulation;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .gallery img, .gallery video {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1px;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal img, .modal video {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .modal-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .prev-btn {
+            position: absolute;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 20px 5px;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: all;
+            border-radius: 5px;
+        }
+        .prev-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .next-btn {
+            position: absolute;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 20px 5px;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: all;
+            border-radius: 5px;
+        }
+        .next-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .modal-controls button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .info {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .nav-buttons {
+            position: fixed;
+            left: 5px;
+            bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-buttons button {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-buttons button:hover {
+            background: rgba(169, 169, 169, 0.4);
+        }
+        .footer-container {
+            width: 100%;
+            padding-top: 10px;
+            padding-bottom: 50px;
+            text-align: center;
+            background: #222;
+            color: white;
+            margin-top: 50px;
+        }
+        .shutdown-btn {
+            background: #a9a9a9;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 180px;
+        }
+        .shutdown-btn:hover {
+            background: #696969;
+        }
+        .reset-db-btn {
+            background: #a9a9a9;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 180px;
+        }
+        .reset-db-btn:hover {
+            background: #696969;
+        }
+        .storage-bar {
+            width: 80%;
+            height: 20px;
+            background-color: #444;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px auto;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .storage-used {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            transition: width 0.5s ease-in-out;
+        }
+        .title-h1 {
+            padding: 0.4em 0.5em;
+            color: #494949;
+            background: #f4f4f4;
+            border-left: solid 5px #52b9a3;
+            border-bottom: solid 3px #d7d7d7;
+        }
+        .f-h2 {
+            padding: 0.1em 0.2em;
+            color: #494949;
+            background: #f4f4f4;
+            border-left: solid 5px #ffd333;
+            border-bottom: solid 3px #d7d7d7;
+        }
+        .img-h2 {
+            padding: 0.1em 0.2em;
+            color: #494949;
+            background: #f4f4f4;
+            border-left: solid 5px #7db4e6;
+            border-bottom: solid 3px #d7d7d7;
+        }
+        .mov-h2 {
+            padding: 0.1em 0.2em;
+            color: #494949;
+            background: #f4f4f4;
+            border-left: solid 5px #ff8533;
+            border-bottom: solid 3px #d7d7d7;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title-h1"><i class="fa-solid fa-server"></i> Pi NAS</h1>
+        <nav>
+            {% for crumb in breadcrumbs %}
+                / <a href="{{ url_for('index', subpath=crumb.path) }}">{{ crumb.name }}</a>
+            {% endfor %}
+        </nav>
+    
+    <h2 class="f-h2"><i class="fa-solid fa-folder-tree"></i> フォルダ</h2>
+        <ul>
+            {% if directories|length > 0 %}
+                {% for directory in directories %}
+                    <li><a href="{{ url_for('index', subpath=(subpath + '/' + directory)|trim('/')) }}">{{ directory }}</a></li>
+                {% endfor %}
+            {% endif %}
+        
+            {% if directories|length == 0 and subpath %}
+                <li><a href="{{ url_for('index', subpath=subpath.rsplit('/', 1)[0]) }}"><i class="fa-solid fa-left-long"></i> Back</a></li>
+            {% endif %}
+        </ul>
+
+    <h2 id="images" class="img-h2"><i class="fa-solid fa-image"></i> 画像</h2>
+        <div class="gallery">
+            {% for image in images %}
+                <img loading="lazy" src="{{ url_for('get_thumbnail', filepath=(subpath + '/' + image.path) | trim('/') ) }}"
+         alt="{{ image.name }}"
+         onclick="openModal(this, false, '{{ url_for('get_file', filepath=(subpath + '/' + image.path) | trim('/') ) }}', '{{ image.name }}', '{{ image.date }}')">
+    
+            {% endfor %}
+        </div>
+    
+    <h2 id="videos" class="mov-h2"><i class="fa-solid fa-video"></i> 動画</h2>
+        <div class="gallery">
+            {% for video in videos %}
+                <img loading="lazy" src="{{ url_for('get_thumbnail', filepath=(subpath + '/' + video.path) | trim('/') ) }}"
+         alt="{{ video.name }}"
+         onclick="openModal(this, true, '{{ url_for('get_file', filepath=(subpath + '/' + video.path) | trim('/') ) }}', '{{ video.name }}', '{{ video.date }}')">
+    
+            {% endfor %}
+        </div>
+    
+    <div class="modal" id="modal">
+        <span class="close" onclick="closeModal()"><i class="fa-regular fa-circle-xmark"></i></span>
+        <div class="modal-content">
+            <div class="info">
+                <span id="file-name"></span>
+                <br />
+                <span id="file-date"></span>
+            </div>
+            <img id="modal-img" style="display: none;">
+            <video id="modal-video" controls style="display: none;"></video>
+            <button class="delete-btn" onclick="deleteFile()"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+        <div class="modal-controls">
+            <button class="prev-btn" onclick="navigate(-1)"><i class="fa-solid fa-caret-left"></i></button>
+            <button class="next-btn" onclick="navigate(1)"><i class="fa-solid fa-caret-right"></i></button>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button onclick="scrollToSection('images')"><i class="fa-solid fa-image"></i></button>
+        <button onclick="scrollToSection('videos')"><i class="fa-solid fa-video"></i></button>
+    
+        <button onclick="scrollToSection('footer-container')"><i class="fa-solid fa-circle-info"></i></button>
+    
+        <button onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i></button>
+    </div>
+
+    <div class="footer-container">
+    <h2><i class="fa-solid fa-circle-info"></i></h2>
+        <div id="system-info">システム情報取得中...</div>
+        <br />
+        <div id="smart-info">SSD情報取得中...</div>
+        <br />
+        <div id="storage-info">ストレージ情報取得中...</div>
+        <div class="storage-bar">
+            <div id="storage-used" class="storage-used"></div>
+        </div>
+    
+        <button id="sync-btn" class="reset-db-btn" onclick="runSync()"><i class="fa-solid fa-sync"></i> 同期</button>
+        <br />
+        <button class="reset-db-btn" onclick="resetDatabase()"><i class="fa-solid fa-database"></i> DBリセット</button>
+        <br />
+        <button id='footer-container' class="shutdown-btn" onclick="shutdownPi()"><i class="fa-solid fa-power-off"></i> シャットダウン</button>
+    </div>
+
+    <script>
+        let imageList = [];
+        let videoList = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            imageList = [
+                {% for image in images %}
+                    {path: "{{ url_for('get_file', filepath=(subpath + '/' + image.path) | trim('/') ) }}", name: "{{ image.name }}", date: "{{ image.date }}"},
+                {% endfor %}
+            ];
+            videoList = [
+                {% for video in videos %}
+                    {path: "{{ url_for('get_file', filepath=(subpath + '/' + video.path) | trim('/') ) }}", name: "{{ video.name }}", date: "{{ video.date }}"},
+                {% endfor %}
+            ];
+        });
+
+        let currentList = [];
+        let currentIndex = 0;
+
+        function openModal(element, isVideo, fullSrc, name, date) {
+            let modal = document.getElementById('modal');
+            let modalImg = document.getElementById('modal-img');
+            let modalVideo = document.getElementById('modal-video');
+            let fileNameElem = document.getElementById('file-name');
+            let fileDateElem = document.getElementById('file-date');
+
+            fileNameElem.textContent = name;
+            fileDateElem.textContent = date || "不明";
+
+            if (isVideo) {
+                currentList = videoList;
+                modalImg.style.display = 'none';
+                modalVideo.style.display = 'block';
+                modalVideo.src = fullSrc;
+            } else {
+                currentList = imageList;
+                modalVideo.style.display = 'none';
+                modalImg.style.display = 'block';
+                modalImg.src = fullSrc;
+            }
+
+            modal.style.display = 'flex';
+            currentIndex = currentList.findIndex(f => f.path === fullSrc);
+            updateNavigationButtons();
+        }
+
+        function closeModal() {
+            let modal = document.getElementById('modal');
+            let video = document.getElementById('modal-video');
+            modal.style.display = 'none';
+            video.pause();
+            video.src = "";
+        }
+
+        function deleteFile() {
+            if (currentIndex === -1 || !currentList[currentIndex]) {
+                alert("削除対象のファイルが見つかりません");
+                return;
+            }
+
+            let filePath = currentList[currentIndex].path.replace("/files/", "");
+            let confirmDelete = confirm("このファイルを削除しますか？");
+            if (!confirmDelete) return;
+            fetch(`/delete/${filePath}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentList.splice(currentIndex, 1);
+                        location.reload();
+                        if (currentList.length === 0) {
+                            closeModal();
+                            return;
+                        }
+                        if (currentIndex >= currentList.length) {
+                            currentIndex = currentList.length - 1;
+                        }
+                        let file = currentList[currentIndex];
+                        openModal(null, currentList === videoList, file.path, file.name, file.date);
+                    } else {
+                        alert("削除に失敗しました");
+                    }
+                })
+                .catch(error => {
+                    console.error("削除エラー:", error);
+                    alert("削除中にエラーが発生しました");
+                });
+        }
+
+        function navigate(direction) {
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0 || newIndex >= currentList.length) {
+                return;
+            }
+            let file = currentList[newIndex];
+            openModal(null, currentList === videoList, file.path, file.name, file.date);
+        }
+
+        function updateNavigationButtons() {
+            let prevButton = document.querySelector(".modal-controls button:nth-child(1)");
+            let nextButton = document.querySelector(".modal-controls button:nth-child(2)");
+            prevButton.style.display = currentIndex > 0 ? "inline-block" : "none";
+            nextButton.style.display = currentIndex < currentList.length - 1 ? "inline-block" : "none";
+        }
+
+        function scrollToSection(id) {
+            let section = document.getElementById(id);
+            if (section) {
+                section.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+
+        let lastTouchEnd = 0;
+        document.addEventListener("touchend", function (event) {
+            let now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+        document.addEventListener("gesturestart", function (event) {
+            event.stopPropagation();
+        }, { passive: false });
+
+        function shutdownPi() {
+            let confirmShutdown = confirm("本当にシャットダウンしますか？");
+            if (!confirmShutdown) return;
+            fetch("/shutdown", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("ラズパイをシャットダウンします...");
+                    } else {
+                        alert("シャットダウンに失敗しました！");
+                    }
+                })
+                .catch(error => {
+                    console.error("エラー:", error);
+                    alert("シャットダウン中にエラーが発生しました");
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/smart")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("smart-info").innerHTML = `
+                        <strong>SSD 状態: ${data.status}</strong><br>
+                        温度: ${data.temperature}<br>
+                        代替セクタ: ${data.reallocated} / 不良セクタ: ${data.pending}
+                    `;
+                })
+                .catch(error => {
+                    console.error("SMART情報取得エラー:", error);
+                    document.getElementById("smart-info").innerHTML = "SMART情報の取得に失敗しました";
+                });
+        });
+
+        function resetDatabase() {
+            if (confirm("本当にデータベースをリセットしますか？\nこの操作は元に戻せません。")) {
+                fetch("/reset_db", { method: "POST" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("データベースをリセットしました。ページをリロードします。");
+                            location.reload();
+                        } else {
+                            alert("リセットに失敗しました。");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("リセットエラー:", error);
+                        alert("リセット中にエラーが発生しました。");
+                    });
+            }
+        }
+
+        function fetchStorageInfo() {
+            fetch("/storage_info")
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        document.getElementById("storage-info").textContent = "ストレージ情報取得失敗";
+                        return;
+                    }
+                    const totalGB = (data.total / (1024 ** 3)).toFixed(2);
+                    const usedGB = (data.used / (1024 ** 3)).toFixed(2);
+                    const freeGB = (data.free / (1024 ** 3)).toFixed(2);
+                    const percent = data.percent.toFixed(1);
+
+                    document.getElementById("storage-info").innerHTML = `
+                        <strong>ストレージ情報</strong><br>
+                        総容量: ${totalGB} GB<br>
+                        使用中: ${usedGB} GB (${percent}%)<br>
+                        残り: ${freeGB} GB
+                    `;
+
+                    document.getElementById("storage-used").style.width = `${percent}%`;
+                })
+                .catch(error => {
+                    console.error("ストレージ情報取得エラー:", error);
+                    document.getElementById("storage-info").textContent = "ストレージ情報取得失敗";
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchStorageInfo);
+
+        function runSync() {
+            let btn = document.getElementById("sync-btn");
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 同期中...';
+            btn.disabled = true;
+            fetch("/run_sync", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("同期完了！");
+                    } else {
+                        alert("同期に失敗しました");
+                    }
+                })
+                .catch(error => {
+                    console.error("エラー:", error);
+                    alert("エラーが発生しました");
+                })
+                .finally(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-sync"></i> 同期';
+                    btn.disabled = false;
+                });
+        }
+
+        function fetchSystemInfo() {
+            fetch("/system_info")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("system-info").textContent = "システム情報取得失敗";
+                        return;
+                    }
+                    document.getElementById("system-info").innerHTML = `
+                        <strong>システム情報</strong><br>
+                        CPU 使用率: ${data.cpu_usage}<br>
+                        CPU 温度: ${data.cpu_temp}<br>
+                        メモリ使用率: ${data.mem_usage}
+                    `;
+                })
+                .catch(error => {
+                    console.error("システム情報取得エラー:", error);
+                    document.getElementById("system-info").textContent = "システム情報取得失敗";
+                });
+        }
+        setInterval(fetchSystemInfo, 5000);
+        document.addEventListener("DOMContentLoaded", fetchSystemInfo);
+    </script>
+</body>
+</html>
