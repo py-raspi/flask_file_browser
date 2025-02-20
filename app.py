@@ -1,3 +1,12 @@
+"""
+MIT License
+
+Copyright (c) 2025 py-raspi
+
+This software is released under the MIT License.
+See LICENSE for details.
+"""
+
 from flask import Flask, render_template, send_from_directory, make_response, request
 import os
 import subprocess
