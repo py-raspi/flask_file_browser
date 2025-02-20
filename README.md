@@ -16,6 +16,16 @@ TailscaleでVPNに接続し、Samba共有も行うため、外出先からでも
 - **KitのURL**: 本リポジトリでは**GitHub上にKitのURLを公開していません**。
   - Free版のKitを使用しているため、[公式サイト](https://fontawesome.com/) から無料アカウントを作成し、各自でKitを取得してください。
 
+## 使用ライセンス
+
+本プロジェクトのソースコードは**MITライセンス**のもとで提供されます。
+
+### 外部ソフトウェアについて
+本プロジェクトでは、ファイル共有機能のために **Samba** を利用しています。  
+Samba自体は **GPLv3ライセンス** で提供されていますが、本プロジェクトではSambaの**設定ファイルのみを提供しており、Samba本体を改変していません**。
+
+詳細は [Samba公式サイト](https://www.samba.org/) をご確認ください。
+
 ## clone
 ```
 git clone https://github.com/py-raspi/flask_file_browser.git
