@@ -7,6 +7,15 @@ TailscaleでVPNに接続し、Samba共有も行うため、外出先からでも
 * <code>sudo</code>を使用します。
 * ユーザーが<code>env.env</code>に環境変数を設定する必要があります
 
+## 使用ライブラリについて
+### FontAwesome
+本プロジェクトでは、[FontAwesome Free](https://fontawesome.com/) の **Free版Kit** を使用しています。
+
+- **ライセンス**: MITライセンス ([詳細はこちら](https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt))
+- **利用条件**: FontAwesome Freeの範囲内で商用・非商用問わず利用可能
+- **KitのURL**: 本リポジトリでは**GitHub上にKitのURLを公開していません**。
+  - Free版のKitを使用しているため、[公式サイト](https://fontawesome.com/) から無料アカウントを作成し、各自でKitを取得してください。
+
 ## clone
 ```
 git clone https://github.com/py-raspi/flask_file_browser.git
