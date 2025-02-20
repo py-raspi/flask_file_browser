@@ -5,7 +5,7 @@ TailscaleでVPNに接続し、Samba共有も行うため、外出先からでも
 
 ## introduction
 * <code>sudo</code>を使用します。
-* ユーザーが環境変数を設定する必要があります
+* ユーザーが<code>env.env</code>に環境変数を設定する必要があります
 
 ## clone
 ```
