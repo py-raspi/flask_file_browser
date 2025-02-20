@@ -44,6 +44,7 @@ sudo sh install.sh
 ```
 
 ### 2️⃣ Sambaのセットアップ
+共有ディレクトリは環境に合わせて変更してください:
 ```sh
 sudo apt update
 sudo mkdir shared
