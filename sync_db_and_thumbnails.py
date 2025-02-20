@@ -1,3 +1,12 @@
+"""
+MIT License
+
+Copyright (c) 2025 py-raspi
+
+This software is released under the MIT License.
+See LICENSE for details.
+"""
+
 import os
 import sys
 import sqlite3
