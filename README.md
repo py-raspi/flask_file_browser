@@ -182,3 +182,9 @@ http://pi5:7001/
 ```
 
 ## Completion
+![Image](https://github.com/user-attachments/assets/95b688a7-14d9-4574-bf9d-f2371c2d4252)
+![Image](https://github.com/user-attachments/assets/15710d96-689a-4afd-81a8-5b0a48557327)
+![Image](https://github.com/user-attachments/assets/006ede7a-d834-4ae6-b5dc-675caa9bf7a8)
+![Image](https://github.com/user-attachments/assets/7c173faf-c25d-434e-aa76-902a2691bfc3)
+![Image](https://github.com/user-attachments/assets/a290d827-14ae-412c-9de2-a5aeae0d9593)
+![Image](https://github.com/user-attachments/assets/1e473489-3ab5-4ba7-bc6f-c4901ba9370e)
