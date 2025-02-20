@@ -1,11 +1,14 @@
 #!/bin/bash
+# MIT License (c) 2025 py-raspi
+# See LICENSE for details.
+
+set -e
 
 # システムの更新
-sudo apt update -y
-sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 
 # 必要なシステムパッケージをインストール
-sudo apt install -y \
+sudo apt install --no-install-recommends -y \
     ffmpeg \
     sqlite3 \
     python3 \
@@ -18,15 +21,19 @@ if [ ! -d "venv" ]; then
 fi
 
 # 仮想環境を有効化
-. venv/bin/activate  # 修正: source → .
+. venv/bin/activate
 
 # pip のアップグレード
 pip install --upgrade pip setuptools wheel
 
 # `requirements.txt` から Python ライブラリをインストール
-pip install --no-cache-dir -r requirements.txt
+if [ -f "requirements.txt" ]; then
+    pip install --no-cache-dir -r requirements.txt
+else
+    echo "⚠️ requirements.txt が見つかりません。"
+fi
 
 # アプリケーションの権限を適切に設定
-chmod -R 755 .
+chmod -R u+rwx,g+rx,o+rx .
 
 echo "インストール完了！"
