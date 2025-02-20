@@ -189,3 +189,7 @@ http://pi5:7001/
 ![Image](https://github.com/user-attachments/assets/7c173faf-c25d-434e-aa76-902a2691bfc3)
 ![Image](https://github.com/user-attachments/assets/17d299e0-d4f0-481f-ace1-c2e88c2601ca)
 ![Image](https://github.com/user-attachments/assets/1e473489-3ab5-4ba7-bc6f-c4901ba9370e)
+
+## ライセンス
+MIT License © 2025 py-raspi  
+詳細は [LICENSE](LICENSE) を参照してください。
